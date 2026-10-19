@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>סוכני AI פרואקטיביים</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="חמש פעולות יזומות של סוכני AI במודל MRFPS: סימנים מוקדמים, בדיקת הנחות, חיבור מידע, מה אם, ותיקון מוקדם">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+<style>
+/* Layout: "ספר מבצעים" — אינדקס קבוע בצד ימין, גיליון עבודה במרכז; כל שלב הוא דף בגיליון */
+:root{
+  --bg:#f3f5f7; --sheet:#ffffff; --ink:#15202b; --muted:#5b6777; --line:#d8dee6; --soft:#eaeef2;
+  --accent:#0b6a66; --accent-soft:#e1f0ee; --accent-ink:#ffffff;
+  --ok:#2f7d3b; --warn:#b07a00; --orange:#c25a12; --bad:#b3261e;
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-body:"IBM Plex Sans Hebrew","Assistant","Arial",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Consolas",monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --sheet:#151d25; --ink:#e7edf3; --muted:#9aa7b6; --line:#2a3642; --soft:#1c2630;
+  --accent:#4fbcb3; --accent-soft:#163533; --accent-ink:#06201e;
+  --ok:#6cc27a; --warn:#e2b23c; --orange:#f08a4b; --bad:#ef6b62; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --sheet:#151d25; --ink:#e7edf3; --muted:#9aa7b6; --line:#2a3642; --soft:#1c2630;
+  --accent:#4fbcb3; --accent-soft:#163533; --accent-ink:#06201e;
+  --ok:#6cc27a; --warn:#e2b23c; --orange:#f08a4b; --bad:#ef6b62; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{direction:rtl;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+
+/* index */
+nav.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px;max-height:calc(100vh - 40px);overflow:auto}
+@media (max-width:860px){nav.index{position:static;max-height:none}}
+.brand{font-family:var(--f-display);font-weight:900;font-size:1.35rem;line-height:1.2;margin:0 0 4px}
+.brand-sub{color:var(--muted);font-size:.82rem;margin:0 0 14px}
+.btn.navtoggle{display:none;width:100%;margin-top:4px;text-align:center}
+main:focus{outline:none}
+@media (max-width:860px){.btn.navtoggle{display:block}.navlist.closed{display:none}}
+.navlist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.navlist a{display:flex;gap:8px;align-items:baseline;padding:6px 8px;border-radius:7px;color:var(--ink);text-decoration:none;font-size:.93rem}
+.navlist a:hover{background:var(--soft)}
+.navlist a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.navlist a[aria-current="page"] .code{color:inherit;opacity:.85}
+.navgroup{margin-top:10px;font-size:.72rem;letter-spacing:.06em;color:var(--muted);padding:0 8px;font-weight:600}
+.navlist .sub a{padding-right:22px;font-size:.88rem}
+.code{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);min-width:1.6em}
+
+/* sheet */
+main{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,3.5vw,40px);min-width:0}
+.eyebrow{font-size:.78rem;letter-spacing:.07em;color:var(--accent);font-weight:700;margin:0 0 6px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:900}
+h2{font-size:1.45rem;font-weight:700;margin-top:30px;margin-bottom:10px}
+h3{font-size:1.12rem;font-weight:700;margin-bottom:6px}
+.lead{font-size:1.12rem;color:var(--ink);max-width:62ch;margin:12px 0 0}
+p{max-width:68ch;margin:8px 0}
+.muted{color:var(--muted)}
+ul.clean{margin:6px 0;padding-right:20px}
+ul.clean li{margin:4px 0;max-width:66ch}
+
+.question{margin-top:18px;border-right:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;font-family:var(--f-display);font-size:1.25rem;font-weight:700}
+.en{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);direction:ltr;unicode-bidi:isolate;margin-inline-start:8px}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:980px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid2,.grid4{grid-template-columns:minmax(0,1fr)}}
+
+.panel{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;min-width:0}
+.panel h3{display:flex;gap:8px;align-items:center}
+.who{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.who.ai{border-color:var(--accent);color:var(--accent)}
+
+.chapter{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:var(--r);padding:14px;text-decoration:none;color:var(--ink);min-width:0}
+.chapter:hover,.chapter:focus-visible{border-color:var(--accent)}
+.chapter .ltr{font-family:var(--f-display);font-size:2rem;font-weight:900;color:var(--accent);line-height:1}
+.chapter .q{font-weight:600}
+.chapter .stages{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.8rem;border:1px solid var(--line);border-radius:99px;padding:2px 9px;color:var(--muted);text-decoration:none;background:var(--sheet)}
+a.chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ribbon of 12 */
+.ribbon{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;margin-top:10px}
+.ribbon a{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;min-width:92px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;text-decoration:none;color:var(--ink);background:var(--sheet)}
+.ribbon a:hover{border-color:var(--accent)}
+.ribbon .n{font-family:var(--f-mono);font-size:.72rem;color:var(--accent)}
+.ribbon .t{font-size:.86rem;font-weight:600;line-height:1.3}
+.ribbon .sep{align-self:center;color:var(--muted);flex:0 0 auto}
+
+.loops{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:8px}
+@media (max-width:700px){.loops{grid-template-columns:minmax(0,1fr)}}
+.loop .flow{font-size:.86rem;color:var(--muted);margin-top:6px}
+
+.example{margin-top:24px;border:1px dashed var(--accent);border-radius:var(--r);padding:14px 18px;background:color-mix(in srgb,var(--accent-soft) 45%,var(--sheet))}
+.example .tag{font-size:.74rem;font-weight:700;letter-spacing:.06em;color:var(--accent)}
+.tablewrap{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:420px}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:right;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.82rem}
+td.num{font-variant-numeric:tabular-nums}
+.gap{color:var(--bad);font-weight:700}
+
+.status{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.s-ok{background:var(--ok)}.s-warn{background:var(--warn)}.s-or{background:var(--orange)}.s-bad{background:var(--bad)}
+
+.layers{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.layer{font-size:.82rem;background:var(--soft);border-radius:6px;padding:3px 9px}
+
+.term{font:inherit;color:inherit;background:none;border:0;padding:0;border-bottom:1.5px dotted var(--accent);cursor:help}
+.term:focus-visible,.chapter:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+#pop{position:fixed;z-index:20;max-width:320px;background:var(--ink);color:var(--sheet);padding:10px 12px;border-radius:8px;font-size:.88rem;line-height:1.5;box-shadow:0 6px 24px rgb(0 0 0 / .25)}
+#pop b{display:block;margin-bottom:2px}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:34px;padding-top:16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn{display:inline-flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:8px;padding:8px 14px;color:var(--ink);text-decoration:none;background:var(--sheet);font:inherit;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn small{color:var(--muted);font-size:.75rem}
+.rule{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.rule .k{font-family:var(--f-display);font-weight:900;color:var(--accent);font-size:1.3rem;min-width:1.4em}
+dl.gloss{display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:0;margin:10px 0}
+dl.gloss dt,dl.gloss dd{padding:9px 0;border-bottom:1px solid var(--line);margin:0}
+dl.gloss dt{font-weight:700;padding-left:14px}
+@media (max-width:560px){dl.gloss{grid-template-columns:minmax(0,1fr)}dl.gloss dt{border-bottom:0;padding-bottom:0}}
+footer{max-width:1180px;margin:16px auto 0;color:var(--muted);font-size:.8rem;text-align:center}
+@media (prefers-reduced-motion:no-preference){main{animation:in .25s ease-out}@keyframes in{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+</style>
+</head>
+<body>
+<style>
+.lbl{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:99px;margin-inline-end:6px;vertical-align:1px;border:1px solid currentColor;white-space:nowrap}
+.lbl.ev{color:var(--ok)} .lbl.inf{color:var(--accent)} .lbl.as{color:var(--warn)} .lbl.un{color:var(--muted)} .lbl.rec{color:var(--orange)}
+.alert{margin-top:12px;border:1px solid var(--line);border-top:4px solid var(--warn);border-radius:var(--r);padding:14px 16px;background:var(--sheet)}
+.alert.hi{border-top-color:var(--bad)}
+.alert .hd{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.alert .hd b{font-family:var(--f-display);font-size:1.12rem}
+.alert .meta{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.alert ul{margin:6px 0 0;padding-inline-start:0;list-style:none}
+.alert li{margin:6px 0;line-height:1.5}
+.alert .ask{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-weight:600}
+ol.steps{list-style:none;padding:0;margin:10px 0 0;counter-reset:s}
+ol.steps li{counter-increment:s;display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+ol.steps li::before{content:counter(s);flex:0 0 28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:.85rem}
+.agents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:620px){.agents{grid-template-columns:minmax(0,1fr)}}
+.agent{border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;min-width:0}
+.agent .nm{font-weight:700}
+.agent .en{margin:0;display:block;margin-top:2px}
+.agent p{margin:6px 0 0;font-size:.92rem}
+.trig{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.trig span{font-size:.84rem;border:1px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--soft)}
+.human{margin-top:14px;border:1px solid var(--line);border-right:4px solid var(--ink);border-radius:0 8px 8px 0;padding:12px 16px}
+.limit{margin-top:12px;border-right:4px solid var(--bad);background:color-mix(in srgb,var(--bad) 7%,var(--sheet));padding:10px 16px;border-radius:0 8px 8px 0}
+.cycle{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.cycle span{border:1px solid var(--accent);color:var(--accent);border-radius:99px;padding:4px 12px;font-weight:600;font-size:.9rem}
+.cycle i{color:var(--muted);font-style:normal}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.filters button{font:inherit;font-size:.84rem;border:1px solid var(--line);border-radius:99px;padding:4px 12px;background:var(--sheet);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.mod{border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;margin-top:10px}
+.mod h3{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.mod .n{font-family:var(--f-mono);color:var(--accent);font-size:.85rem}
+.mod p{margin:6px 0}
+.chain{margin-top:12px}
+.chain .st{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);margin-top:8px;transition:opacity .25s}
+.chain .st.off{opacity:.25}
+.chain .st .ic{flex:0 0 34px;height:34px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-family:var(--f-mono);font-size:.8rem}
+.chain .st.hum .ic{background:var(--ink);color:var(--sheet)}
+.chain .st p{margin:2px 0 0;font-size:.93rem}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.turn{border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;margin-top:8px}
+.turn .who2{font-weight:700;font-size:.85rem;color:var(--accent)}
+.turn.crit .who2{color:var(--bad)} .turn.hist .who2{color:var(--warn)} .turn.arb{border-color:var(--ink)} .turn.arb .who2{color:var(--ink)}
+.turn p{margin:4px 0 0}
+.week{margin-top:10px}
+.day{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.day .d{font-weight:700;font-family:var(--f-display)}
+.day .ev{margin:0 0 6px}
+@media (max-width:520px){.day{grid-template-columns:minmax(0,1fr);gap:2px}}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+@media (max-width:760px){.ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.ladder{grid-template-columns:minmax(0,1fr)}}
+.ladder div{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;border-top-width:4px}
+.ladder b{display:block;margin-bottom:4px}
+.ladder p{margin:0;font-size:.88rem}
+.vs td:first-child{font-weight:600;white-space:nowrap}
+.pq{font-family:var(--f-display);font-size:1.3rem;font-weight:700;text-align:center;margin:22px auto 6px;max-width:40ch}
+</style>
+
+<div class="wrap">
+  <nav class="index" aria-label="ניווט בדף">
+    <p class="brand">סוכני AI פרואקטיביים</p>
+    <p class="brand-sub">מה הסוכנים עושים לפני שמישהו שואל</p>
+    <button class="btn navtoggle" id="navtoggle" type="button" aria-expanded="false" aria-controls="navlist">הצג את תוכן העניינים</button>
+    <ul class="navlist closed" id="navlist"></ul>
+  </nav>
+  <main id="view" tabindex="-1"></main>
+</div>
+<footer>הדוגמאות בדף הן המחשה של עבודת המודל בבית חולים אזורי. המספרים בהן בדויים.</footer>
+<div id="pop" hidden role="tooltip"></div>
+
+<script>
+const G={
+ weak:["סימן חלש (Weak Signal)","שינוי קטן, חריגה או דפוס שעדיין אינם פער או כשל. לבדו נראה זניח; יחד עם אחרים הוא עשוי להצביע על סיכון מתהווה."],
+ ew:["התרעה מוקדמת (Early Warning)","הודעה שנוצרת כשסימנים, פערים ושינויים מתחברים למשמעות אפשרית עבור המשימה, לפני שהכשל קרה."],
+ change:["מה השתנה מאז הפעם הקודמת?","השאלה הקבועה של מודל המציאות. אבל שינוי אינו בהכרח שינוי במוכנות, ולכן כל שינוי נבדק מול המשימה."],
+ hidden:["חולשה נסתרת","חולשה שאינה נראית בבדיקה רגילה: נקודת כשל יחידה, תלות משותפת, גיבוי מדומה, ריכוז ידע אצל אדם אחד, או צירוף של כמה חולשות קטנות."],
+ falsered:["גיבוי מדומה (False Redundancy)","שתי מערכות שנראות כגיבוי זו לזו, אבל תלויות באותו רכיב. כשהרכיב נופל, שתיהן נופלות."],
+ common:["תלות משותפת (Common Dependency)","רכיב אחד, אדם או ספק שכמה יכולות נשענות עליו. נקודת תורפה שנראית רק כשמחברים את המידע."],
+ assumption:["הנחת יסוד","דבר שהתוכנית מניחה שהוא נכון בלי ראיה עדכנית. במודל, כל הנחה קריטית מסומנת ומקבלת מועד לבדיקה חוזרת."],
+ aging:["התיישנות ראיה","ראיה שהייתה תקפה ואיבדה את תוקפה: עבר זמן, השתנו התנאים, או הוחלפה המערכת שנבדקה."],
+ kg:["גרף ידע (Knowledge Graph)","ייצוג של הקשרים בין משימות, יכולות, דרישות, אנשים, מערכות, ראיות ופערים. ממצא של סוכן אחד הופך כך לקלט של האחרים."],
+ breaking:["נקודת השבירה","התנאים שבהם יכולת עוברת מ'מוכנה' ל'לא מוכנה': כמה עומס, כמה חוסר, כמה זמן."],
+ premortem:["Pre-Mortem","מניחים שהמשימה כבר נכשלה ושואלים: מה היה הסיפור? כך נחשפים כשלים שקשה להעלות כשמניחים הצלחה."],
+ redteam:["צוות אדום של AI","סוכן שתפקידו לנסות להכשיל את התוכנית או את הערכת המוכנות, ולחפש דרכי כשל שאינן בתרחיש הבסיס."],
+ chainbreak:["שבירת שרשרת הכשל","איתור הנקודה שבה התערבות אחת עוצרת התפתחות של כשל, ולעתים כמה מסלולי סיכון בבת אחת (נקודת מנוף)."],
+ decay:["דעיכת ידע","ידע ומיומנות שלא תורגלו זמן רב נשחקים, גם אם ההכשרה רשומה כ'בוצעה'."],
+ micro:["תרגיל זעיר (Micro-Drill)","תרגול קצר וממוקד, של דקות, שבודק השערה אחת במציאות או מרענן מיומנות שדועכת."],
+ declared:["מוכנות מוצהרת","מוכנות שנשענת על דיווח או מסמך בלבד."],
+ verified:["מוכנות מאומתת","מוכנות שנבדקה מול ראיות עדכניות ועקיבות."],
+ proven:["מוכנות מוכחת","מוכנות שהוכחה בביצוע בפועל, בתנאים קשים."],
+ illusion:["מוכנות מדומה","דוחות ירוקים, ומציאות שלא תעמוד במבחן."],
+ hitl:["אדם בלולאה (Human-in-the-Loop)","כל החלטה בעלת משמעות עוברת דרך בעל סמכות אנושי, שמפרש, מאמת, מחליט ונושא באחריות."],
+ meta:["חשיבה על החשיבה (Meta-Reasoning)","שכבת־העל שבה ה־AI בודק את עצמו: על אילו הנחות נשענה המסקנה שלו, מה חסר, ומה עלול להפריך אותה."],
+ debate:["דיון רב־סוכנים (Multi-Agent Debate)","כמה סוכנים בעלי נקודות מבט שונות (מתכנן, מבקר, היסטוריה ולקחים, בורר) מתווכחים לפי פרוטוקול, וההכרעה נשענת על ראיות."],
+};
+const T=(k,l)=>`<button type="button" class="term" data-k="${k}">${l||G[k][0]}</button>`;
+const L={ev:'<span class="lbl ev">ראיה</span>',inf:'<span class="lbl inf">היסק</span>',as:'<span class="lbl as">הנחה</span>',un:'<span class="lbl un">לא ידוע</span>',rec:'<span class="lbl rec">המלצה</span>'};
+const ag=(nm,en,d)=>`<div class="agent"><span class="nm">${nm}</span><span class="en">${en}</span><p>${d}</p></div>`;
+
+const A=[
+{id:'signals',n:1,name:'לזהות סימנים לפני המחדל',short:'סימנים והתרעות',
+ q:'מה מתחיל להשתנות, עוד לפני שמשהו נשבר?',
+ why:`מחדלים לא קורים ביום אחד. יש להם תקופת דגירה, ובה סימנים מצטברים. כל סימן לבדו נראה זניח, כל אחד מגיע לגורם אחר, ואיש לא מחבר. תחקיר שמתחיל אחרי האירוע ימצא אותם בדיעבד. הסוכן מחפש אותם בזמן אמת.`,
+ agents:[
+  ['מנוע זיהוי סימנים חלשים','Weak Signals Detection Engine','מאתר שינויים קטנים, חריגות ומגמות שעדיין אינם פער.'],
+  ['מאגד סימנים חלשים','Weak Signals Aggregator','מחבר כמה סימנים שכל אחד מהם זניח, ובודק אם יחד הם מצביעים על סיכון.'],
+  ['מנוע זיהוי שינוי','Change Detection Engine',`שואל ברציפות ${T('change','"מה השתנה מאז הפעם הקודמת?"')}, ובודק אם השינוי נוגע למוכנות.`],
+  ['זיהוי הסתייגות סמויה','Hidden Reservation Detection','קורא דיווחים ומזהה ניסוחים מסויגים: "בדרך כלל", "בתנאי ש…", "צפוי להסתדר".'],
+  ['מנתח מרווח ונקודת שבירה','Readiness Margin Analyzer','מעריך כמה קרובה יכולת לסף שבו היא מפסיקה לעמוד בדרישה.'],
+  ['מנוע התרעה מוקדמת','Early Warning Engine',`מחליט אם הצירוף מצדיק ${T('ew','התרעה מוקדמת')}, באיזו רמה ולמי.`]],
+ trig:['דיווח חדש נכנס למערכת','מדד משנה מגמה, גם אם לא חצה סף','ראיה מתקרבת למועד התפוגה שלה','סריקה יומית קבועה של כל הזרמים'],
+ steps:['סורק דיווחי שטח, תקלות, נוכחות, תחזוקה ותחקירים, בלי לחכות לשאלה.','משווה כל נתון לתבנית הרגילה ולמצב בפעם הקודמת.','מסנן: האם השינוי נוגע למשימה? שינוי אינו בהכרח שינוי במוכנות.','מאגד סימנים שחולקים תלות, יכולת או משמרת.','מדרג את הצירוף: סימן, מעקב או התרעה.','שולח לבעל התפקיד הסבר, ראיות ורמת ביטחון.'],
+ out:{lvl:'',title:'התרעה מוקדמת: המרווח במשמרת הלילה נשחק',meta:'Early Warning Engine · רמה: התרעה',
+  items:[`${L.ev} זמן ההגעה של צוות הכוננים בלילה עלה בהדרגה מ־11 ל־17 דקות בשישה שבועות.`,
+   `${L.ev} בדיקת העומס של הגנרטור נדחתה פעמיים. מועד הבדיקה הבא חורג מהנוהל.`,
+   `${L.ev} שתיים מארבע אחראיות המשמרת המיומנות בטריאז' המוני אינן זמינות בלילות החודש.`,
+   `${L.inf} שלושת הסימנים פוגעים באותן 30 הדקות הראשונות, ובאותה משמרת. בלילה, זמן הקליטה המשוער של 100 נפגעים הוא 31–34 דקות.`,
+   `${L.un} לא נערך תרגיל לילה מאז ההוכחה ב־27 דקות, שבוצעה ביום.`],
+  ask:'מבוקש: החלטה אם לקיים בדיקת פתע לילית קצרה בשבוע הבא.'},
+ human:'בעל התפקיד מחליט אם לבדוק, להסלים, או לסמן "נבדק, לא רלוונטי" ולנמק. הנימוק נשמר. אם הסימן חוזר, הוא יחזור עם ההיסטוריה שלו.',
+ limit:`${T('weak','סימן חלש')} אינו סיכון, וסיכון אינו כשל. הסוכן שומר על ההבחנה, ולא מציף. גם כשהוא לא מתריע, הוא מתעד מה ראה, כך שאפשר יהיה לחזור לזה.`,
+ layers:['3 מודל המציאות','5 זיהוי והערכה','6 סיכון והתרעה'],
+ ex:`בבדיקה הרגילה כל אחד משלושת הנתונים "ירוק": זמן ההגעה בתוך התקן, הגנרטור תקין, המשמרות מאוישות. רק הצירוף מראה שבלילה המרווח שהיה 3 דקות כבר הפך, ככל הנראה, לגירעון.`},
+
+{id:'assumptions',n:2,name:'לבחון הנחות יסוד באופן קבוע',short:'הנחות יסוד',
+ q:'על מה אנחנו סומכים, בלי שבדקנו לאחרונה?',
+ why:`הנחת יסוד שלא נבדקה זמן רב הופכת, בעיני הארגון, לעובדה. כולם "יודעים" שהיא נכונה, ולכן איש אינו בודק. כך נבנית קונספציה. הסוכן בודק הנחות גם כשאין תקלה, כי כשהתקלה מגיעה, כבר מאוחר.`,
+ agents:[
+  ['מאתגר הנחות','Assumption Challenger',`מחלץ ${T('assumption','הנחות יסוד')} מהתוכניות, גם כאלה שלא נכתבו, ושואל מה יקרה אם הן שגויות.`],
+  ['מאתגר ביקורתי','AI Critical Challenger','שואל: האם אנחנו בטוחים? איזו ראיה חסרה? מה יכול להפריך את ההערכה?'],
+  ['חיפוש ראיות סותרות','Contradictory Evidence Search','מחפש באופן פעיל מידע שמפריך את ההנחה, לא רק מידע שתומך בה.'],
+  ['מנטר התיישנות ראיות','Evidence Aging Monitor',`מזהה ${T('aging','ראיה שהתיישנה')}, ומחזיר את הטענה שנשענה עליה לסטטוס "לא מאומת".`],
+  ['ביטחון מול מציאות','Confidence vs Reality','משווה את רמת הביטחון שהארגון מצהיר עליה לרמת הראיות שיש בידיו.'],
+  ['דיון רב־סוכנים','Multi-Agent Debate','מתכנן, מבקר, היסטוריה ולקחים ובורר מתווכחים על הנחה קריטית, וההכרעה נשענת על ראיות.']],
+ trig:['לכל הנחה קריטית יש מועד בדיקה חוזרת','שינוי בסביבה שנוגע להנחה','נכנסה ראיה שסותרת אותה','ביטחון גבוה בלי ראיה עדכנית'],
+ steps:['מחלץ הנחות מהתוכניות, מהנהלים ומהדיווחים, כולל מה שלא נכתב במפורש.','ממפה על אילו יכולות ומשימות כל הנחה נשענת.','מסווג כל טענה: ראיה, היסק, הנחה או לא ידוע.','מחפש באופן פעיל ראיות שסותרות את ההנחה.','שואל "מה אם היא שגויה?" ומעביר את השאלה לסוכן התרחישים.','מציע את הבדיקה הזולה ביותר שתאשר את ההנחה או תפריך אותה.'],
+ out:{lvl:'',title:'הנחה קריטית שלא נבדקה: מערכת הקריאה לכוננים',meta:'Assumption Challenger · רמה: מעקב',
+  items:[`${L.as} תוכנית אר"ן מניחה ש־80% מהכוננים יגיעו בתוך 20 דקות מהקריאה.`,
+   `${L.ev} ההנחה נבדקה לאחרונה לפני 26 חודשים.`,
+   `${L.ev} מאז הוחלפה מרכזיית הטלפונים של בית החולים, ורשימת הכוננים עברה למערכת חדשה.`,
+   `${L.inf} התוכנית נשענת על ההנחה בשלוש יכולות קריטיות: טריאז', חדר ניתוח ראשון וצוות טראומה.`,
+   `${L.rec} בדיקת קריאה לא מוכרזת בשעה 03:00. עלות: כ־15 דקות של צוות. ללא הגעה בפועל.`],
+  ask:'מבוקש: אישור לבדיקה, או קבלת הסיכון ביודעין ובחתימה.'},
+ human:'בעל הסמכות מחליט: לאשר את ההנחה מחדש על סמך ראיה, להורות על בדיקה, או לקבל את הסיכון ביודעין. כל אחת מהאפשרויות נרשמת עם שם ונימוק.',
+ limit:`הסוכן לא מערער על הכול כל הזמן. הוא מתעדף לפי חשיבות ההנחה למשימה ולפי הזמן שעבר מאז הבדיקה האחרונה. אחרת הערעור עצמו הופך לרעש.`,
+ layers:['2 המוכנות הנדרשת','4 ראיות וידע','7 תרחיש ואתגור','שכבת־על: חשיבה על החשיבה'],
+ ex:`בבדיקת הפתע ענו בתוך 20 דקות 58% מהכוננים, לא 80%. רשימת הטלפונים במערכת החדשה לא עודכנה בשינויי אנשי צוות של השנה האחרונה. מה שהיה "עובדה" בתוכנית התברר כהנחה שגויה, לפני שקרה דבר. בלי הבדיקה, זו הייתה ${T('illusion')}.`},
+
+{id:'connect',n:3,name:'לחבר מידע מפוזר לתמונת סיכון אחת',short:'חיבור מידע',
+ q:'מה רואים רק כשמחברים את כל החלקים?',
+ why:`במחדלים רבים המידע היה קיים, אבל מפוזר: בדוח ביקורת אחד, בתקלה שנרשמה במחלקה אחרת, בחוזה שאיש לא קרא בהקשר הזה. כל גורם ראה חלק, ואיש לא ראה את התמונה. הסוכן מחבר את החלקים לרשת אחת.`,
+ agents:[
+  ['סוכן אינטגרציית מידע','Data Integration Agent','קולט דיווחי שטח, תקלות, ביקורות, חוזים ונוכחות ממקורות שונים.'],
+  ['זיהוי ישויות','Entity Resolution Agent','מזהה שאותו אדם, מערכת או ספק מופיעים בשמות שונים במקורות שונים.'],
+  ['סוכן GraphRAG','Knowledge Retrieval / GraphRAG',`מאתר ידע רלוונטי לפי הקשרים ב${T('kg','גרף הידע')}, לא רק לפי מילים.`],
+  ['מנוע חולשות נסתרות','Hidden Weakness Detection Engine',`מחפש נקודת כשל יחידה, ${T('common','תלות משותפת')}, ${T('falsered','גיבוי מדומה')} וריכוז ידע.`],
+  ['מנוע התפשטות השפעה','Impact Propagation Engine','עוקב איך פגיעה ברכיב אחד מתפשטת לאורך התלויות עד המשימה.'],
+  ['תמונת מוכנות חיה','Living Readiness Picture / Master Map','מציג את כל הקשרים במפה אחת שמתעדכנת עם כל פריט מידע.']],
+ trig:['נכנס פריט מידע חדש, מכל מקור','שינוי בישות שיש לה תלויים רבים','סריקה שבועית של כל התלויות','ממצא של סוכן אחר'],
+ steps:['קולט מידע מכל המקורות, כולל מסמכים שלא נכתבו בשביל המוכנות.','מזהה ישויות זהות שמופיעות בשמות שונים.','מקשר לגרף: משימה ← יכולת ← דרישה ← אדם, מערכת או ספק.','מחפש תלות משותפת, גיבוי מדומה וריכוז ידע.','מעביר את ההשפעה לאורך הקשרים, עד המשימה.','מעדכן את תמונת המוכנות החיה, עם מסלול עקיבות לכל קשר.'],
+ out:{lvl:'hi',title:'חולשה נסתרת: שני הגנרטורים אינם גיבוי זה לזה',meta:'Hidden Weakness Engine · רמה: התרעה',
+  items:[`${L.ev} דוח תחזוקה (אגף הנדסה): שני הגנרטורים מוזנים מאותו מכל סולר.`,
+   `${L.ev} חוזה רכש (אגף כספים): ספק דלק יחיד, שמספק גם לבית החולים השכן.`,
+   `${L.ev} סיכום תרגיל עירוני (קב"ט): כביש הגישה של המיכלית נחסם בתרגיל.`,
+   `${L.inf} גיבוי מדומה ותלות משותפת. בהפסקת חשמל ממושכת יחד עם חסימת כביש, שתי המערכות עלולות להיפגע יחד.`,
+   `${L.un} כמה שעות פעולה מבטיח המכל במצב חירום. הנתון לא נמצא באף מסמך.`],
+  ask:'מבוקש: מינוי בעלים לסיכון. הוא נופל כרגע בין שלושה אגפים.'},
+ human:'אדם מאמת את הקשר: האם התלות אמיתית? ומחליט מי הבעלים של סיכון משותף. סיכון כזה נופל לעתים קרובות בין יחידות, ובדיוק לכן איש לא טיפל בו.',
+ limit:`קשר שה־AI הסיק מסומן "היסק" עד שאדם מאמת אותו. גרף שגוי מייצר ביטחון שגוי, ולכן לכל קשר יש מקור.`,
+ layers:['3 מודל המציאות','4 ראיות וידע','5 זיהוי והערכה','שכבה רוחבית: ידע, קשרים וזמן'],
+ ex:`שלושה מסמכים, בשלושה אגפים, נכתבו לשלוש מטרות אחרות. אף אחד מהם לא שגוי. רק החיבור ביניהם חושף שהגיבוי שעליו נשענת כל תוכנית החירום הוא, בפועל, נקודת כשל אחת.`},
+
+{id:'whatif',n:4,name:'לשאול "מה יקרה אם…"',short:'מה אם',
+ q:'איפה נקודת השבירה, ובאיזה מסלול נגיע אליה?',
+ why:`ארגונים מתרגלים בדרך כלל את התרחיש הסביר, ובתנאים נוחים. המחדל מגיע מצירוף שלא תורגל. הסוכן מחפש את הצירופים האלה מראש, ומחפש את הנקודה שבה המוכנות נשברת, במקום לבדוק רק אם היא עומדת בתנאים רגילים.`,
+ agents:[
+  ['מחולל תרחישים','Scenario Generation Agent','מציע תרחישים מתוך החולשות הידועות, לא מתוך התרחיש הנוח.'],
+  ['צוות אדום ומחולל כשלים','AI Red Team / Failure Generator',`${T('redteam','צוות אדום')} שמנסה להכשיל את התוכנית ומחפש דרכי כשל שאינן בתרחיש הבסיס.`],
+  ['מכונת שרשרת הכשל','Failure Chain Engine','בונה את המסלול שבו כשל קטן מתפתח לכשל במשימה.'],
+  ['מנוע חיפוש נקודת שבירה','Breaking Point Search Engine',`מגביר עומס, חוסר ולחץ זמן עד ${T('breaking')}.`],
+  ['מנוע לחץ החלטות','Decision Stress Engine','בוחן החלטות תחת עומס, זמן קצר ומידע חלקי.'],
+  ['למידה מאירועים חיצוניים','External Events Learning','כשמשהו קורה בארגון דומה בעולם, שואל: האם זה יכול לקרות גם כאן?']],
+ trig:['שינוי מהותי בתוכנית או בסביבה','אירוע בארגון דומה, בארץ או בעולם','הנחה שהתגלתה כשגויה','לפני תרגיל: מה כדאי לתרגל','מחזור קבוע'],
+ steps:['מנסח תרחיש מתוך החולשות שכבר ידועות.',`מפעיל ${T('premortem')}: נניח שנכשלנו. מה היה הסיפור?`,'מגביר בהדרגה עומס, חוסרים ולחץ זמן, עד נקודת השבירה.','בונה את שרשרת הכשל, ומסמן היכן אפשר לשבור אותה.','בוחן את ההחלטות שיידרשו: מה יחליט המנהל בשלוש דקות, עם מידע חלקי.','מתרגם את התוצאה להצעת תרגיל זעיר שיבדוק את ההשערה במציאות.'],
+ out:{lvl:'',title:'תוצאת סימולציה: נקודת שבירה ב־70 נפגעים',meta:'Breaking Point Search · השערה, לא ראיה',
+  items:[`${L.as} תרחיש: אירוע רב־נפגעים בלילה, כשמעלית ה־CT בתחזוקה מתוכננת.`,
+   `${L.inf} שרשרת: פצועי ראש לא מגיעים ל־CT בזמן ← תור במיון ← מיטות הטריאז' נחסמות ← קליטה נעצרת.`,
+   `${L.inf} נקודת השבירה המשוערת: כ־70 נפגעים, לא 100.`,
+   `${L.ev} לוח התחזוקה של המעליות אינו מתואם עם תוכנית אר"ן.`,
+   `${L.rec} תרגיל זעיר של 15 דקות: העברת פצוע מדומה ל־CT במסלול החלופי, ומדידת הזמן.`],
+  ask:'מבוקש: אישור לתרגיל, ובחינת תיאום לוח התחזוקה.'},
+ human:'בעלי התפקידים בוחרים אילו תרחישים לבדוק בתרגיל, ובאיזו רמה. רק תוצאת תרגיל, לא תוצאת סימולציה, נחשבת ראיה.',
+ limit:`תרחיש שה־AI ייצר הוא השערה, לא ראיה, ולא ניבוי. הוא כלי לבחינת עמידות. אם הוא חושף חולשה אפשרית, היא עוברת לבדיקה במציאות.`,
+ layers:['6 סיכון וכשל','7 תרחיש, סימולציה ואתגור'],
+ ex:`בתרגיל הזעיר נמשכה ההעברה במסלול החלופי 14 דקות במקום 4. הסימולציה לא "צדקה". היא הצביעה על מקום שכדאי לבדוק, והבדיקה במציאות מצאה שם פער.`},
+
+{id:'fix',n:5,name:'לתקן פערי מוכנות מוקדם',short:'תיקון מוקדם',
+ q:'מה הפעולה הקטנה ביותר שתמנע את הבעיה הגדולה?',
+ why:`פערים ידועים נשארים פתוחים כי אין דחיפות. לקחים נרשמים ולא מוטמעים. אותו ממצא חוזר מתרגיל לתרגיל, ובכל פעם מוגדרת פעולה אחרת. הסוכן לא מחכה שהפער יתפרץ כמשבר: הוא מאתר את נקודת המנוף, עוקב אחרי הביצוע ובודק שהתיקון אכן עבד.`,
+ agents:[
+  ['מנוע שבירת שרשרת והתערבות','Chain-Breaking / Intervention Engine',`${T('chainbreak','שובר שרשרת')}: מאתר תלות אחת שמזינה כמה מסלולי סיכון.`],
+  ['מנוע תיעדוף','Prioritization Engine','מדרג פעולות לפי חשיבות למשימה, לא לפי ותק הממצא או רעש.'],
+  ['מחולל חלופות','Alternative Generation Agent','מציע שתיים־שלוש דרכי פעולה, עם עלות, זמן והשפעה צפויה.'],
+  ['מאמן מוכנות','AI Readiness Coach / Micro-Coaching',`מזהה ${T('decay','דעיכת ידע')} ומציע ${T('micro','אימון זעיר')}, לאדם הנכון ובזמן הנכון.`],
+  ['מזהה ממצאים חוזרים','Repeat Finding Detector','מזהה שאותו סוג ממצא חוזר לאורך שנים, גם כשהניסוח השתנה.'],
+  ['מזהה לולאות פתוחות','Open Loop Detector','מאתר פעולות ולקחים שלא הגיעו לאימות.']],
+ trig:['פער חדש בעל חשיבות למשימה','פעולה מתקנת שעברה את מועדה','לקח שלא אומת','ממצא שחוזר','ידע שלא תורגל זמן רב'],
+ steps:['מאתר נקודת מנוף: תלות אחת שמזינה כמה פערים.','מציע שתיים־שלוש חלופות, עם עלות, זמן והשפעה צפויה.','מתעדף לפי חשיבות למשימה.','מפעיל אימון זעיר לאנשים שהידע שלהם דועך.','עוקב אחרי הביצוע ומזהה לולאות פתוחות.','מתכנן בדיקה חוזרת. הפער נסגר רק כשיש ראיה.'],
+ out:{lvl:'',title:'נקודת מנוף: שלושה פערים, שורש אחד',meta:'Chain-Breaking Engine · המלצה',
+  items:[`${L.ev} "הכשרת כוננים לטריאז' המוני" נרשמה כממצא בתרגילים של 2023, 2024 ו־2026. בכל פעם הוגדרה פעולה אחרת.`,
+   `${L.inf} שלושת הפערים שנמצאו החודש (זמן הגעה בלילה, מערכת הקריאה, אחראיות משמרת) תלויים באותו דבר: רשימת כוננים מעודכנת ומתורגלת בלילה.`,
+   `${L.rec} חלופה א: תרגיל לילה זעיר של 10 דקות, פעם בחודש, וסנכרון אוטומטי של רשימת הכוננים.`,
+   `${L.rec} חלופה ב: הכשרה מרוכזת ליומיים. עלות גבוהה יותר; בעבר לא מנעה את החזרה.`,
+   `${L.ev} בדיקה חוזרת מתוכננת: תרגיל לילה מלא בעוד חודשיים.`],
+  ask:'מבוקש: בחירת חלופה, מינוי אחראי ואישור מועד הבדיקה החוזרת.'},
+ human:'בעל הסמכות בוחר חלופה, מקצה משאבים, ממנה אחראי ומאשר סגירה של הפער. הסגירה מאושרת רק מול ראיה מהבדיקה החוזרת.',
+ limit:`הסוכן ממליץ ועוקב. הוא לא מבצע שינוי בארגון, לא מקצה משאבים ולא סוגר פער בעצמו. "בוצע" אינו "תוקן": רק בדיקה חוזרת מוכיחה.`,
+ layers:['8 התערבות והחלטה','9 אימות, למידה ועדכון'],
+ ex:`אחרי חודשיים של תרגילי לילה זעירים, נמדד בתרגיל לילה מלא זמן של 29 דקות. המוכנות עברה מ${T('declared','"מוצהרת"')} ל${T('proven','"מוכחת"')}, גם בלילה. הממצא שחזר שלוש שנים נסגר, עם ראיה.`},
+];
+
+const MODS=[
+ ['Mission & Requirement Intelligence','הבנת המשימה והדרישות','מאתר עמימות, סתירות ודרישות חסרות. שואל אם הדרישות עצמן עדיין נכונות.',['assumptions'],'1–2'],
+ ['Reality Intelligence','מודל המציאות','מאחד מידע ממקורות שונים ושואל ברציפות "מה השתנה?".',['signals','connect'],'3'],
+ ['Evidence Intelligence','ראיות','מזהה ראיות שהתיישנו, טענות בלי ראיה וראיות סותרות.',['assumptions','signals'],'4'],
+ ['Continuous Comparison & Gap','השוואה רציפה ופערים','משווה נדרש מול מצוי, קודם מול נוכחי, טענה מול ראיה.',['signals','fix'],'5'],
+ ['Weakness & Weak Signal','חולשות וסימנים חלשים',`מאתר ${T('hidden','חולשות נסתרות')}, סימנים חלשים ותלויות קריטיות.`,['signals','connect'],'5'],
+ ['Risk & Early Warning','סיכון והתרעה','מקשר סימנים לסיכון למשימה, ומחליט על רמת ההתרעה.',['signals','connect'],'6'],
+ ['Failure Intelligence','כשל','בונה שרשראות כשל ולומד מכשלים פנימיים וחיצוניים.',['whatif','connect'],'6'],
+ ['Critical Reasoning & Scenario','חשיבה ביקורתית ותרחישים','מאתגר הנחות, מפעיל צוות אדום, תרחישים וסימולציות.',['assumptions','whatif'],'7'],
+ ['Intervention & Decision Support','התערבות ותמיכה בהחלטה','מאתר נקודות מנוף, מציע חלופות ומתעדף.',['fix'],'8'],
+ ['Verification & Learning','אימות ולמידה','בודק שהתיקון עבד, מזהה ממצאים חוזרים ולולאות פתוחות.',['fix','assumptions'],'9'],
+ ['Meta-Reasoning & Self-Challenge','שכבת־על: בדיקה עצמית','בודק את המסקנות של הסוכנים עצמם: על מה הן נשענות ומה עלול להפריך אותן.',['signals','assumptions','connect','whatif','fix'],'רוחבית'],
+];
+
+const ORDER=['overview',...A.map(a=>a.id),'roster','chain','debate','week','guard','glossary'];
+const TITLE={overview:'תמונת העל',roster:'מפת הסוכנים',chain:'תגובת שרשרת',debate:'ויכוח בין סוכנים',week:'שבוע אחד',guard:'גבולות ובקרה',glossary:'מילון'};
+A.forEach(a=>TITLE[a.id]=a.name);
+
+function pager(k){const i=ORDER.indexOf(k),p=ORDER[i-1],n=ORDER[i+1];
+ return `<div class="pager">${p?`<a class="btn" href="#${p}"><small>הקודם</small>→ ${TITLE[p]}</a>`:'<span></span>'}${n?`<a class="btn" href="#${n}"><small>הבא</small>${TITLE[n]} ←</a>`:`<a class="btn" href="#overview"><small>חזרה</small>תמונת העל ←</a>`}</div>`;}
+
+const V={};
+V.overview=()=>`<p class="eyebrow">סוכני AI במודל</p>
+<h1>לא לחכות לשאלה</h1>
+<p class="lead">ברוב הארגונים, בדיקת מוכנות מתחילה כשמישהו מבקש אותה, ותחקיר מתחיל אחרי שמשהו נכשל. במודל, סוכני ה־AI פועלים מיוזמתם: הם מחפשים סימנים, בודקים הנחות, מחברים מידע, שואלים "מה אם" ומציעים תיקון, עוד לפני שמישהו שאל.</p>
+<div class="question">המטרה: להקטין את הסיכוי שהארגון לא יראה בזמן את מה שהיה אפשר לראות, לחבר, לבדוק או לאתגר.</div>
+<h2>תגובתי מול יזום</h2>
+<div class="tablewrap"><table class="vs"><thead><tr><th></th><th>תגובתי</th><th>יזום (פרואקטיבי)</th></tr></thead><tbody>
+<tr><td>מתי פועל</td><td>כשמבקשים, או אחרי אירוע</td><td>ברציפות, ובכל שינוי שנוגע למשימה</td></tr>
+<tr><td>השאלה</td><td>"מה קרה?"</td><td>"מה מתחיל לקרות?" ו"מה אם?"</td></tr>
+<tr><td>מקור המידע</td><td>מה שהוגש לבדיקה</td><td>כל הזרמים, גם אלה שלא נכתבו בשביל המוכנות</td></tr>
+<tr><td>הנחות היסוד</td><td>מתקבלות כנתון</td><td>נבדקות לפי מועד ולפי שינוי</td></tr>
+<tr><td>התוצר</td><td>דוח ממצאים</td><td>התרעה מוסברת, השערה לבדיקה, הצעת תיקון</td></tr>
+<tr><td>מי יוזם</td><td>אדם</td><td>הסוכן יוזם. האדם מחליט</td></tr>
+</tbody></table></div>
+<h2>חמש הפעולות היזומות</h2>
+<div class="grid2">${A.map(a=>`<a class="chapter" href="#${a.id}"${a.n===5?' style="grid-column:1/-1"':''}><span class="ltr">${a.n}</span><span class="q">${a.name}</span><span class="muted">${a.q}</span></a>`).join('')}</div>
+<h2>מחזור אחד, חמש פעולות</h2>
+<p>הפעולות אינן כלים נפרדים. ממצא של פעולה אחת הוא קלט של הבאה: סימן מעורר בדיקת הנחה, הנחה שגויה מזינה תרחיש, תרחיש חושף תלות, ותלות מובילה לתיקון ממוקד.</p>
+<div class="cycle"><span>רואה</span><i>←</i><span>מאתגר</span><i>←</i><span>מחבר</span><i>←</i><span>חוקר</span><i>←</i><span>מציע</span><i>←</i><span>בודק שוב</span><i>↺</i></div>
+<div class="grid2" style="margin-top:22px">
+ <div class="panel"><h3><span class="who ai">AI</span>יוזם, מחבר ומאתגר</h3><p>מזהה, מחבר, משווה, מאתגר, חוקר, מסביר וממליץ. כל מסקנה מסומנת: ראיה, היסק, הנחה או לא ידוע.</p></div>
+ <div class="panel"><h3><span class="who">אדם</span>מפרש, מחליט ונושא באחריות</h3><p>מפרש, מאמת, מחליט ומאשר. היוזמה של הסוכן לא מעבירה אליו סמכות. ראו ${T('hitl','אדם בלולאה')}.</p></div>
+</div>
+<div class="example"><span class="tag">הדוגמה שמלווה את הדפים</span><p>בית החולים האזורי מהדף "כך זה עובד" הוכיח קליטה של 100 נפגעים ב־27 דקות. חצי שנה עברה. איש לא ביקש בדיקה חדשה. בכל אחד מחמשת הדפים תראו מה הסוכנים מצאו בכל זאת, ומה עשו עם זה האנשים.</p></div>
+${pager('overview')}`;
+
+A.forEach(a=>{V[a.id]=()=>`<p class="eyebrow">פעולה יזומה ${a.n} מתוך 5</p>
+<h1>${a.name}</h1>
+<div class="question">${a.q}</div>
+<h2>למה זה חשוב</h2><p>${a.why}</p>
+<h2>הסוכנים והמנועים</h2><div class="agents">${a.agents.map(x=>ag(...x)).join('')}</div>
+<h2>מה מפעיל אותם</h2><p class="muted" style="margin:0">הסוכן לא מחכה לבקשה. אלה האירועים שמעוררים אותו:</p>
+<div class="trig">${a.trig.map(t=>`<span>${t}</span>`).join('')}</div>
+<h2>מה הסוכן עושה</h2><ol class="steps">${a.steps.map(s=>`<li><span>${s}</span></li>`).join('')}</ol>
+<h2>מה מגיע לאדם</h2>
+<div class="alert ${a.out.lvl}"><div class="hd"><b>${a.out.title}</b><span class="meta">${a.out.meta}</span></div><ul>${a.out.items.map(i=>`<li>${i}</li>`).join('')}</ul><div class="ask">${a.out.ask}</div></div>
+<div class="human"><b>נקודת ההחלטה האנושית.</b> ${a.human}</div>
+<div class="limit"><b>הגבול.</b> ${a.limit}</div>
+<h2>שכבות המודל</h2><div class="layers">${a.layers.map(l=>`<span class="layer">${l}</span>`).join('')}</div>
+<div class="example"><span class="tag">בדוגמה: מה קרה אחר כך</span><p>${a.ex}</p></div>
+${pager(a.id)}`;});
+
+let filt=null;
+V.roster=()=>`<p class="eyebrow">איך הסוכנים עובדים יחד</p><h1>מפת הסוכנים</h1>
+<p class="lead">השמות הרבים בדפים הקודמים אינם עשרות סוכנים עצמאיים. הם יכולות של כעשרה מודולי AI, שכולם עובדים על אותו ${T('kg','גרף ידע')}. כך ממצא של מודול אחד הופך לקלט של אחר.</p>
+<p class="muted" style="margin-bottom:0">סננו לפי פעולה יזומה:</p>
+<div class="filters"><button type="button" data-f="" aria-pressed="${!filt}">הכול</button>${A.map(a=>`<button type="button" data-f="${a.id}" aria-pressed="${filt===a.id}">${a.n}. ${a.short}</button>`).join('')}</div>
+${MODS.filter(m=>!filt||m[3].includes(filt)).map((m,i)=>`<div class="mod"><h3><span class="n">שכבה ${m[4]}</span>${m[1]}<span class="en">${m[0]}</span></h3><p>${m[2]}</p><div class="layers">${m[3].map(id=>{const a=A.find(x=>x.id===id);return `<a class="chip" href="#${id}">${a.n}. ${a.short}</a>`}).join('')}</div></div>`).join('')}
+${pager('roster')}`;
+
+const CH=[
+ ['מנטר התיישנות ראיות','Evidence Aging Monitor','אישור התקינות של מערכת הקריאה לכוננים פג לפני שבוע.'],
+ ['השוואה רציפה','Continuous Comparator','היכולת "גיוס כוננים בתוך 20 דקות" עוברת מ"מאומתת" ל"לא מאומתת".'],
+ ['מנוע פערים','Gap Detection Engine','נפתח פער ראייתי: לא ידוע אם הדרישה מתקיימת. זה עדיין לא פער מבצעי.'],
+ ['מנוע סיכון','Mission-Aware Risk Engine','היכולת נדרשת לשלוש משימות קריטיות. החשיבות גבוהה.'],
+ ['מנוע התרעה מוקדמת','Early Warning Engine','בודק סימנים נוספים באותה יכולת, ומוצא את עליית זמן ההגעה בלילה. מעלה לרמת התרעה.'],
+ ['סוכן תכנון אימות','Verification Planning Agent','מציע את הבדיקה הזולה ביותר: קריאה לא מוכרזת בשעה 03:00.'],
+ ['אדם','Human Authority','מנהלת אר"ן מאשרת את הבדיקה וממנה אחראי. ההחלטה, השם והנימוק נרשמים.']];
+let chStep=1;
+V.chain=()=>`<p class="eyebrow">איך הסוכנים עובדים יחד</p><h1>תגובת שרשרת</h1>
+<p class="lead">שום סוכן לא "מדבר לעצמו". כאן פריט מידע אחד, ראיה שפג תוקפה, עובר בין שישה מנועים עד שהוא מגיע לאדם, כהחלטה ברורה. לחצו כדי לעקוב צעד אחר צעד.</p>
+<div class="chain">${CH.map((c,i)=>`<div class="st ${i>=chStep?'off':''} ${i===CH.length-1?'hum':''}"><span class="ic">${i===CH.length-1?'אדם':i+1}</span><div><b>${c[0]}</b><span class="en">${c[1]}</span><p>${c[2]}</p></div></div>`).join('')}</div>
+<div class="ctrl"><button class="btn" type="button" id="chNext" ${chStep>=CH.length?'disabled':''}>הצעד הבא</button><button class="btn" type="button" id="chAll">הצג הכול</button><button class="btn" type="button" id="chReset">מההתחלה</button></div>
+<p style="margin-top:18px">איש לא ביקש מהמערכת לבדוק את מערכת הקריאה. התאריך הוא שהפעיל אותה. זו המשמעות של "יזום" במודל: המערכת מגיבה לשינוי במציאות, לא לבקשה.</p>
+${pager('chain')}`;
+
+const DB=[
+ ['plan','מתכנן','Planner','יש לנו מספיק כוח אדם לתרחיש. לפי התקן, 20 אנשים במשמרת החירום.'],
+ ['crit','מבקר','Critic / Red Team','בתרגיל האחרון הגיעו בפועל 15.'],
+ ['hist','היסטוריה ולקחים','History & Lessons','בשלושת התרגילים הקודמים נרשמה ירידה בזמינות כוח האדם.'],
+ ['plan','מתכנן','Planner','מאז הוספנו חמישה עובדים.'],
+ ['crit','מבקר','Critic','נכון, אבל שניים מהם עדיין לא עברו הכשרה.'],
+ ['arb','בורר','Arbitrator','הטענה "יש 20 עובדים" נכונה מבחינה כמותית, אבל אינה מוכיחה מוכנות מבצעית. הטענה של המבקר נשענת על ראיה מתרגיל; הטענה של המתכנן נשענת על תקן.']];
+let dbStep=1;
+V.debate=()=>`<p class="eyebrow">איך הסוכנים עובדים יחד</p><h1>ויכוח בין סוכנים</h1>
+<p class="lead">סוכן אחד עלול לקבל את הנחות התוכנית ולנתח אותה מאותה נקודת מבט של הארגון. לכן, בהנחות קריטיות, המודל מפעיל ${T('debate','דיון רב־סוכנים')}: לכל סוכן אינטרס אחר, וההכרעה נשענת על ראיות, לא על מי שטען יפה יותר.</p>
+<div class="grid4" style="margin-top:12px">
+ <div class="panel"><b>מתכנן</b><p class="muted" style="margin:4px 0 0">לגרום למשימה להצליח</p></div>
+ <div class="panel"><b>מבקר</b><p class="muted" style="margin:4px 0 0">למצוא איך היא תיכשל</p></div>
+ <div class="panel"><b>היסטוריה ולקחים</b><p class="muted" style="margin:4px 0 0">לזכור מה כבר קרה</p></div>
+ <div class="panel"><b>בורר</b><p class="muted" style="margin:4px 0 0">להכריע לפי ראיות</p></div>
+</div>
+<h2>דוגמה</h2>
+<div>${DB.slice(0,dbStep).map(d=>`<div class="turn ${d[0]}"><span class="who2">${d[1]} · <span class="en" style="margin:0">${d[2]}</span></span><p>${d[3]}</p></div>`).join('')}</div>
+<div class="ctrl"><button class="btn" type="button" id="dbNext" ${dbStep>=DB.length?'disabled':''}>התור הבא</button><button class="btn" type="button" id="dbReset">מההתחלה</button></div>
+${dbStep>=DB.length?`<div class="alert"><div class="hd"><b>חבילת ההחלטה</b><span class="meta">Decision Package</span></div><ul>
+<li>${L.ev} ${T('declared','מוכנות מוצהרת')}: גבוהה.</li>
+<li>${L.inf} ${T('verified','מוכנות מאומתת')}: בינונית.</li>
+<li>${L.ev} פער קריטי: זמינות של צוות מוכשר, לא מספר העובדים.</li>
+<li>${L.un} מחלוקת שנותרה: אם שני העובדים החדשים יוכשרו לפני התרגיל הבא.</li>
+<li>${L.rec} להשלים הכשרה לשניים ולבדוק בתרגיל.</li></ul></div>`:''}
+<p style="margin-top:16px">המטרה אינה הסכמה בין הסוכנים. המטרה היא מסקנה שעומדת בביקורת. לעתים קרובות, דווקא המחלוקת שנותרה היא הדבר החשוב ביותר שהמנהל צריך לראות.</p>
+${pager('debate')}`;
+
+const WK=[
+ ['ראשון',[['signals','סריקה יומית: זמן ההגעה של הכוננים בלילה עלה שוב, בשבוע השישי ברציפות. נרשם כמעקב.']]],
+ ['שני',[['assumptions','ראיית התקינות של מערכת הקריאה פגה. ההנחה "80% בתוך 20 דקות" חוזרת לסטטוס "הנחה".'],['signals','שלושה סימנים באותה יכולת ובאותה משמרת. רמה עולה להתרעה.']]],
+ ['שלישי',[['connect','דוח תחזוקה חדש נקלט. נמצא קשר בינו לבין חוזה הדלק ולסיכום התרגיל העירוני. נפתחה חולשה נסתרת.']]],
+ ['רביעי',[['whatif','בעולם דווח על בית חולים שנותק מחשמל בסערה. נבחן התרחיש המקביל כאן. נמצאה נקודת שבירה משוערת.']]],
+ ['חמישי',[['fix','מזהה הממצאים החוזרים מקשר את ממצאי השבוע לממצא מ־2023, 2024 ו־2026. מוצעת נקודת מנוף אחת.'],['fix','מאמן המוכנות שולח לשתי אחראיות משמרת תרגול זעיר של 5 דקות בטריאז\' המוני.']]],
+ ['שישי',[['assumptions','סיכום שבועי למנהלת אר"ן: שלוש החלטות ממתינות, כל אחת עם ראיות, רמת ביטחון ומחיר.']]],
+];
+V.week=()=>`<p class="eyebrow">איך הסוכנים עובדים יחד</p><h1>שבוע אחד, בלי שמישהו ביקש</h1>
+<p class="lead">כך נראה שבוע של סוכנים יזומים בבית החולים. אף אחת מהפעולות לא התחילה מבקשה. כולן התחילו מנתון, מתאריך או מאירוע.</p>
+<div class="week">${WK.map(d=>`<div class="day"><span class="d">${d[0]}</span><div>${d[1].map(e=>{const a=A.find(x=>x.id===e[0]);return `<p class="ev"><a class="chip" href="#${a.id}">${a.n}. ${a.short}</a> ${e[1]}</p>`}).join('')}</div></div>`).join('')}</div>
+<p style="margin-top:16px">מה לא קרה השבוע: הסוכנים לא שינו נוהל, לא הזיזו משמרת ולא סגרו פער. הם הביאו לשולחן שלוש החלטות שאחרת היו מתגלות, אולי, בתחקיר.</p>
+${pager('week')}`;
+
+V.guard=()=>`<p class="eyebrow">גבולות</p><h1>יוזמה בלי השתלטות</h1>
+<p class="lead">סוכן יזום הוא כלי חזק, ולכן הגבולות שלו צריכים להיות ברורים במיוחד. היוזמה היא בחיפוש, בחיבור ובשאלה. ההחלטה נשארת אצל אדם.</p>
+<h2>ארבעה דברים שהסוכן לא עושה</h2>
+<div class="rule"><span class="k">1</span><div><b>לא קובע לבדו שהארגון מוכן.</b> מוכנות קריטית מחייבת ראיה, אימות וסמכות אנושית.</div></div>
+<div class="rule"><span class="k">2</span><div><b>לא הופך השערה לעובדה.</b> כל היסק של AI מסומן כהיסק.</div></div>
+<div class="rule"><span class="k">3</span><div><b>לא הופך תרחיש לניבוי.</b> תרחיש בוחן עמידות. הוא אינו תחזית.</div></div>
+<div class="rule"><span class="k">4</span><div><b>לא מחליף אחריות פיקודית.</b> הוא מספק מודיעין ותמיכה בהחלטה. הסמכות והאחריות אנושיות.</div></div>
+<h2>כל פריט מסומן</h2>
+<p>${L.ev} נשען על מקור, תאריך ותנאים. ${L.inf} מסקנה של המערכת. ${L.as} נכון לפי התוכנית, ולא נבדק לאחרונה. ${L.un} אין מספיק מידע. ${L.rec} הצעה לפעולה, שממתינה להחלטה.</p>
+<h2>סולם ההסלמה</h2>
+<p>כדי לא להציף, לא כל ממצא הופך להתרעה. הסוכן מדרג, ומי שמקבל את ההודעה משתנה לפי הרמה.</p>
+<div class="ladder">
+ <div style="border-top-color:var(--line)"><b>סימן</b><p>נרשם בתמונה החיה. אינו נשלח לאיש.</p></div>
+ <div style="border-top-color:var(--accent)"><b>מעקב</b><p>נשלח לבעל התפקיד בסיכום התקופתי.</p></div>
+ <div style="border-top-color:var(--warn)"><b>התרעה</b><p>נשלחת לבעל התפקיד מיד, עם בקשה להחלטה.</p></div>
+ <div style="border-top-color:var(--bad)"><b>התרעה דחופה</b><p>משימה קריטית בסיכון ממשי. עולה לדרג הבכיר.</p></div>
+</div>
+<h2>בקרה על הסוכנים עצמם</h2>
+<ul>
+<li><b>עקיבות.</b> כל פעולה יזומה משאירה עקבה: מה הפעיל אותה, על מה נשענה ומה הוצע.</li>
+<li><b>זכות לומר "לא".</b> אדם רשאי לדחות כל התרעה. הנימוק נשמר, והסוכן לומד ממנו.</li>
+<li><b>${T('meta','בדיקה עצמית')}.</b> שכבת־העל בודקת את המסקנות של הסוכנים: על אילו הנחות נשענו ומה עלול להפריך אותן.</li>
+<li><b>מדידת רעש.</b> כמה התרעות נדחו, וכמה התבררו כנכונות. סוכן שמציף מאבד את אמון האנשים, ואיתו את ערכו.</li>
+</ul>
+<p class="pq">ה־AI מזהה, מחבר, מאתגר, חוקר וממליץ.<br>האדם מפרש, מאמת, מחליט ונושא באחריות.</p>
+${pager('guard')}`;
+
+V.glossary=()=>`<p class="eyebrow">מילון</p><h1>מושגים בדף</h1><p class="lead">בכל הדפים, מושג מסומן בקו מנוקד מציג את הגדרתו בלחיצה. כאן הם מרוכזים.</p>
+<dl class="gloss">${Object.values(G).map(g=>`<dt>${g[0]}</dt><dd>${g[1]}</dd>`).join('')}</dl>${pager('glossary')}`;
+
+const nav=document.getElementById('navlist');
+nav.innerHTML=`<li><a href="#overview"><span class="code">◎</span>תמונת העל</a></li><li class="navgroup">חמש הפעולות היזומות</li><li class="sub"><ul class="navlist">${A.map(a=>`<li><a href="#${a.id}"><span class="code">0${a.n}</span>${a.name}</a></li>`).join('')}</ul></li>
+<li class="navgroup">איך הסוכנים עובדים יחד</li><li><a href="#roster"><span class="code">⌘</span>מפת הסוכנים</a></li><li><a href="#chain"><span class="code">⇢</span>תגובת שרשרת</a></li><li><a href="#debate"><span class="code">⇄</span>ויכוח בין סוכנים</a></li><li><a href="#week"><span class="code">◷</span>שבוע אחד</a></li>
+<li class="navgroup">גבולות</li><li><a href="#guard"><span class="code">◐</span>גבולות ובקרה</a></li><li><a href="#glossary"><span class="code">§</span>מילון</a></li>`;
+
+const view=document.getElementById('view');
+function route(scroll=true){
+ let h=(location.hash||'#overview').slice(1); if(!V[h]) h='overview';
+ view.innerHTML=V[h]();
+ nav.querySelectorAll('a').forEach(a=>a.getAttribute('href')==='#'+h?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+ hidePop();
+ view.querySelectorAll('.filters button').forEach(b=>b.addEventListener('click',()=>{filt=b.dataset.f||null;route(false);}));
+ const on=(id,f)=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{f();route(false);});};
+ on('chNext',()=>chStep=Math.min(CH.length,chStep+1));on('chAll',()=>chStep=CH.length);on('chReset',()=>chStep=1);
+ on('dbNext',()=>dbStep=Math.min(DB.length,dbStep+1));on('dbReset',()=>dbStep=1);
+ if(scroll&&location.hash){view.focus({preventScroll:true});view.scrollIntoView({block:'start'});}
+}
+const pop=document.getElementById('pop');
+function hidePop(){pop.hidden=true;}
+document.addEventListener('click',e=>{const t=e.target.closest('.term');if(!t){if(!e.target.closest('#pop'))hidePop();return;}
+ const [n,d]=G[t.dataset.k];pop.innerHTML=`<b>${n}</b>${d}`;pop.hidden=false;
+ const r=t.getBoundingClientRect(),w=Math.min(320,innerWidth-24);pop.style.maxWidth=w+'px';
+ let x=Math.min(Math.max(12,r.right-w),innerWidth-w-12),y=r.bottom+8;if(y+pop.offsetHeight>innerHeight-12)y=r.top-pop.offsetHeight-8;
+ pop.style.left=x+'px';pop.style.top=Math.max(12,y)+'px';});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hidePop();});
+addEventListener('scroll',hidePop,{passive:true});
+const tg=document.getElementById('navtoggle');
+tg.addEventListener('click',()=>{const open=nav.classList.toggle('closed')===false;tg.setAttribute('aria-expanded',open);tg.textContent=open?'הסתר את תוכן העניינים':'הצג את תוכן העניינים';});
+nav.addEventListener('click',e=>{if(e.target.closest('a')&&innerWidth<=860){nav.classList.add('closed');tg.setAttribute('aria-expanded','false');tg.textContent='הצג את תוכן העניינים';}});
+document.documentElement.dir='rtl';document.documentElement.lang='he';
+addEventListener('hashchange',()=>route());route();
+</script>
+
+</body>
+</html>
